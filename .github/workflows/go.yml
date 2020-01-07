@@ -23,5 +23,32 @@ jobs:
       uses: manusa/actions-setup-openshift@v1.0.0
       with:
         oc version: 'v3.11.0'
+
     - name: Interact with the cluster
-      run: oc cluster status
+      run: |
+        oc cluster status
+        kubectl version
+
+    - name: Prepare cluster for testing
+      id: local-path
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        USERNAME: 1gtm
+        REGISTRY_SECRET: regcred
+      run: |
+        echo "waiting for nodes to be ready ..."
+        kubectl wait --for=condition=Ready nodes --all --timeout=5m
+        kubectl get nodes
+        echo
+        echo "installing local-path provisioner ..."
+        kubectl delete storageclass --all
+        kubectl apply -f https://github.com/rancher/local-path-provisioner/raw/v0.0.11/deploy/local-path-storage.yaml
+        kubectl wait --for=condition=Ready pods -n local-path-storage --all --timeout=5m
+        kubectl apply -f hack/kubernetes/storageclass/standard.yaml
+        echo
+        echo "install helm 3"
+        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+        echo
+        echo "create docker-registry secret"
+        kubectl create secret docker-registry ${REGISTRY_SECRET} --namespace=kube-system --docker-server=https://index.docker.io/v1/ --docker-username=${USERNAME} --docker-password=${DOCKER_TOKEN}
+
