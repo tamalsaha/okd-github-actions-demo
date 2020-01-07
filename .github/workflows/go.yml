@@ -48,3 +48,26 @@ jobs:
         # echo
         # echo "create docker-registry secret"
         # kubectl create secret docker-registry ${REGISTRY_SECRET} --namespace=kube-system --docker-server=https://index.docker.io/v1/ --docker-username=${USERNAME} --docker-password=${DOCKER_TOKEN}
+
+    - name: Test
+      run: |
+        echo
+        echo ">>> run pod"
+        kubectl apply -f hack/kubernetes/pod.yaml
+        echo ">>> get pod"
+        for i in {1..12}; do kubectl get pod;echo;sleep 5; done
+        echo
+        echo ">>> get pod"
+        kubectl get pod volume-test -o go-template="{{range .status.containerStatuses}}{{.lastState.terminated.message}}{{end}}"
+        echo
+        echo ">>> describe pod"
+        kubectl get pod -n default volume-test -o yaml
+        echo
+        echo ">>> show pod logs"
+        kubectl logs -n default volume-test
+        echo
+        kubectl get pvc -o yaml
+        echo
+        kubectl get pv -o yaml
+        echo
+        kubectl get nodes
