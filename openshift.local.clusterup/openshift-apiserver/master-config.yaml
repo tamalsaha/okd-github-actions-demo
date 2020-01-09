@@ -115,8 +115,12 @@ kubeletClientInfo:
 kubernetesMasterConfig:
   apiLevels:
   - v1
-  apiServerArguments: null
-  controllerArguments: null
+  apiServerArguments:
+    feature-gates:
+    - DynamicProvisioningScheduling=false
+  controllerArguments:
+    feature-gates:
+    - DynamicProvisioningScheduling=false
   disabledAPIGroupVersions: {}
   masterEndpointReconcileTTL: 15
   masterIP: 127.0.0.1
@@ -124,7 +128,9 @@ kubernetesMasterConfig:
   proxyClientInfo:
     certFile: master.proxy-client.crt
     keyFile: master.proxy-client.key
-  schedulerArguments: null
+  schedulerArguments:
+    feature-gates:
+    - DynamicProvisioningScheduling=false
   schedulerConfigFile: ""
   servicesNodePortRange: 30000-32767
   servicesSubnet: 172.30.0.0/16
