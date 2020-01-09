@@ -43,3 +43,6 @@ volumeConfig:
   localQuota:
     perFSGroup: null
 volumeDirectory: /var/lib/origin/cluster-up/home/tamal/go/src/github.com/tamalsaha/okd-github-actions-demo/openshift.local.clusterup/openshift.local.volumes
+kubeletArguments:
+  feature-gates:
+  - DynamicProvisioningScheduling=true
